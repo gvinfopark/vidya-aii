@@ -1,0 +1,11 @@
+export const thCls = "bg-bg-secondary py-4 px-4 sm:px-6 text-left text-xs uppercase text-text-muted border-b border-border";
+export const tdCls = "py-3 px-3.5 sm:py-4 sm:px-6 border-b border-border text-text text-[13px] sm:text-sm align-middle";
+export const actionBtnCls = "py-1.5 px-3 rounded font-medium text-xs cursor-pointer border-none";
+export const editInputCls = "py-1 px-2 rounded border border-border bg-bg text-text text-[13px] w-full max-w-[160px]";
+export const iconBtnCls = "p-1.5 rounded cursor-pointer border-none inline-flex items-center justify-center";
+export const inputCls = "py-2 px-3 rounded-lg border border-border bg-bg text-text text-sm w-full outline-none focus:border-accent";
+export const textareaCls = "py-2 px-3 rounded-lg border border-border bg-bg text-text text-sm w-full outline-none focus:border-accent resize-y min-h-[70px]";
+export const labelCls = "text-xs font-bold text-text-muted uppercase tracking-wide mb-1.5 block";
+export const cardCls = "bg-surface border border-border rounded-2xl p-5 sm:p-6 shadow-token_sm";
+export const primaryBtnCls = "py-2.5 px-5 rounded-lg font-bold text-sm cursor-pointer border-none bg-accent text-text-on-accent hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed";
+export const secondaryBtnCls = "py-2.5 px-5 rounded-lg font-semibold text-sm cursor-pointer bg-surface border border-border text-text hover:bg-bg-tertiary";

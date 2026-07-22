@@ -1,0 +1,485 @@
+/* ─── VIDYA AI — Claude-style chat interface ───────────────────────────── */
+.vidya-root { @apply flex h-screen h-[100dvh] overflow-hidden bg-bg font-sans; }
+
+/* ── Left rail (topics / persona panel) ──────────────────────────── */
+.vidya-sidebar {
+  @apply w-[280px] min-w-[280px] bg-bg-secondary border-r border-border flex flex-col overflow-y-auto overflow-x-hidden;
+}
+.vidya-sidebar::-webkit-scrollbar { width: 4px; }
+.vidya-sidebar::-webkit-scrollbar-thumb { background: var(--c-border-strong, #DAD6C7); border-radius: 4px; }
+
+.vidya-sidebar-top { @apply pt-[22px] px-[18px] pb-0 flex flex-col gap-4; }
+
+/* Brand */
+.vidya-brand { @apply flex items-center gap-2.5; }
+
+.vidya-custom-brand-logo-wrap {
+  @apply w-[42px] h-[42px] flex items-center justify-center shrink-0 rounded-[10px] bg-transparent;
+}
+
+.vidya-custom-brand-logo-img { @apply w-full h-full object-contain; }
+
+.vidya-brand-text { @apply font-sans text-[1.15rem] leading-none text-text; }
+.vidya-brand-sub {
+  @apply text-[0.62rem] tracking-[1.2px] uppercase mt-0.5 font-semibold;
+  color: var(--vidya-accent);
+}
+
+/* Exam badges */
+.vidya-exam-row { @apply flex gap-1.5 flex-wrap; }
+.vidya-badge { @apply py-1 px-2.5 rounded-token_pill text-[0.67rem] font-bold tracking-wide; }
+.badge-neet  { background: rgba(63,146,80,0.10);  color: #2E7D4F; border: 1px solid rgba(63,146,80,0.28); }
+.badge-jeem  { background: rgba(56,120,253,0.10); color: #2A5FC7; border: 1px solid rgba(56,120,253,0.25); }
+.badge-jeea  { background: rgba(147,113,247,0.10);color: #7C4FE0; border: 1px solid rgba(147,113,247,0.25); }
+.badge-board { background: rgba(218,119,86,0.12); color: var(--c-accent-text, #B4501F); border: 1px solid rgba(218,119,86,0.3); }
+
+/* Avatar stage */
+.vidya-avatar-stage {
+  @apply relative h-[180px] flex items-center justify-center rounded-token_lg overflow-hidden border border-border bg-surface;
+}
+.vidya-stage-bg { @apply absolute inset-0 transition-[background] duration-500; }
+.vidya-stage-glow {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150px] h-[150px] rounded-full blur-[28px] z-0;
+}
+/* ── Avatar animation — everything below lives ON the logo wrapper itself
+   (via ::before/::after pseudo-elements), so it can never drift out of
+   alignment with the actual logo, and every color comes straight from
+   --vidya-accent / --vidya-accent-rgb, the theme's "color key". ── */
+.vidya-avatar-wrap {
+  position: relative;
+  z-index: 2;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: vidyaFloat 4s ease-in-out infinite;
+}
+@keyframes vidyaFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-7px) rotate(3deg); }
+}
+
+/* Idle — a slow dashed ring with two accent-colored beacons, orbiting the logo.
+   Lives as a pseudo-element on the wrap itself, so it's always dead-center. */
+.vidya-avatar-wrap::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 128px; height: 128px;
+  margin: -64px 0 0 -64px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(var(--vidya-accent-rgb), 0.3);
+  background:
+    radial-gradient(circle 2.5px at 50% 2px, var(--vidya-accent) 99%, transparent 100%),
+    radial-gradient(circle 2.5px at 50% calc(100% - 2px), rgba(var(--vidya-accent-rgb), 0.55) 99%, transparent 100%);
+  animation: vidyaOrbitSpin 16s linear infinite, vidyaHueCycle 6s linear infinite;
+  pointer-events: none;
+  transition: border-color 0.3s ease;
+  z-index: -1;
+}
+.vidya-avatar-stage:hover .vidya-avatar-wrap::before {
+  animation-duration: 5s, 6s;
+  border-color: rgba(var(--vidya-accent-rgb), 0.6);
+}
+@keyframes vidyaOrbitSpin { to { transform: rotate(360deg); } }
+@keyframes vidyaHueCycle {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Speaking / thinking — a second ring, also pinned to the wrap, whose shape
+   and motion change per state but whose color always tracks the accent. */
+.vidya-avatar-wrap::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 55px; height: 55px;
+  margin: -27.5px 0 0 -27.5px;
+  border-radius: 50%;
+  border: 2px solid var(--vidya-accent);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.vidya-avatar-logo-img {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(var(--vidya-accent-rgb), 0.35));
+  transition: filter 0.3s ease;
+}
+
+/* Speaking — the logo itself glows and gently scales in the accent color
+   (replaces the old rainbow hue-rotate, which ignored the color key). */
+.vidya-avatar-wrap.speaking::after {
+  animation: vidyaRingOut 1.4s ease-out infinite, vidyaHueCycle 2s linear infinite;
+}
+@keyframes vidyaRingOut {
+  0%   { width: 55px; height: 55px; margin: -27.5px 0 0 -27.5px; opacity: 0.5; }
+  100% { width: 170px; height: 170px; margin: -85px 0 0 -85px; opacity: 0; }
+}
+.vidya-avatar-wrap.speaking .vidya-avatar-logo-img {
+  animation: vidyaGlowPulse 0.9s ease-in-out infinite;
+}
+@keyframes vidyaGlowPulse {
+  0%, 100% { transform: scale(1);    filter: drop-shadow(0 6px 14px rgba(var(--vidya-accent-rgb), 0.4)); }
+  50%      { transform: scale(1.05); filter: drop-shadow(0 8px 22px rgba(var(--vidya-accent-rgb), 0.85)); }
+}
+
+/* Thinking — the logo breathes in place while a soft accent-colored sweep
+   rotates around it; both driven from the same class, both accent-colored. */
+.vidya-avatar-wrap.thinking::after {
+  width: 76px; height: 76px;
+  margin: -38px 0 0 -38px;
+  border: none;
+  opacity: 1;
+  background: conic-gradient(from 0deg, transparent 0%, var(--vidya-accent) 35%, transparent 70%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+          mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: vidyaThinkSpin 1.1s linear infinite, vidyaHueCycle 3s linear infinite;
+}
+@keyframes vidyaThinkSpin { to { transform: rotate(360deg); } }
+.vidya-avatar-wrap.thinking .vidya-avatar-logo-img {
+  animation: vidyaBreathe 1.4s ease-in-out infinite;
+}
+@keyframes vidyaBreathe {
+  0%, 100% { transform: scale(1);    filter: drop-shadow(0 6px 14px rgba(var(--vidya-accent-rgb), 0.4)); }
+  50%      { transform: scale(1.08); filter: drop-shadow(0 8px 22px rgba(var(--vidya-accent-rgb), 0.65)); }
+}
+
+/* Pulse glow — fires the moment a question is sent, independent of the
+   thinking/speaking rings, so the logo visibly reacts right away. */
+.vidya-avatar-wrap.pulse-glow .vidya-avatar-logo-img {
+  animation: vidyaFloat 4s ease-in-out infinite, vidyaPulseGlow 0.8s ease-in-out 3;
+  border-radius: 50%;
+}
+@keyframes vidyaPulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 6px 14px rgba(var(--vidya-accent-rgb), 0.4));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 26px rgba(var(--vidya-accent-rgb), 0.9));
+    transform: scale(1.07);
+  }
+}
+
+/* Teacher info */
+.vidya-teacher-info { @apply text-center px-4; }
+.vidya-teacher-info h2 { @apply font-sans text-text text-[1.15rem]; }
+.vidya-role-tag {
+  @apply inline-block mt-1 py-1 px-2.5 rounded-token_pill text-[0.66rem] font-bold tracking-wider uppercase;
+}
+.vidya-subject-chips { @apply flex gap-1.5 flex-wrap justify-center mt-2; }
+.vidya-chip {
+  @apply py-0.5 px-2 rounded-[10px] text-[0.6rem] font-semibold bg-bg-tertiary text-text-muted border border-border;
+}
+
+/* Divider / labels */
+.vidya-divider { @apply h-px bg-border my-2; }
+.vidya-section-label {
+  @apply text-[0.63rem] font-bold tracking-[1.2px] opacity-60 uppercase px-[18px] text-text-faint mb-2;
+}
+
+/* Search history */
+.vidya-history-wrap { @apply py-1 px-[18px] pb-4 flex flex-col min-h-0; }
+.vidya-history-label-row { @apply flex items-center justify-between mb-2; }
+.vidya-qt-label { @apply text-[0.63rem] font-bold tracking-[1.2px] opacity-60 uppercase text-text-faint; }
+.vidya-history-clear {
+  @apply bg-transparent border-none text-text-faint cursor-pointer p-[3px] flex items-center rounded-md transition-all;
+}
+.vidya-history-clear:hover { color: var(--vidya-accent); @apply bg-accent-soft; }
+
+.vidya-history-search-box { @apply relative flex items-center mb-2.5; }
+.vidya-history-search-icon { @apply absolute left-2.5 text-text-faint pointer-events-none; }
+.vidya-history-search-input {
+  @apply w-full bg-surface border border-border text-text py-2 pr-[30px] pl-[30px] rounded-token_sm text-xs font-sans outline-none box-border transition-all;
+}
+.vidya-history-search-input:focus {
+  border-color: var(--vidya-accent);
+  box-shadow: 0 0 0 3px rgba(var(--vidya-accent-rgb), 0.12);
+}
+.vidya-history-search-input::placeholder { @apply text-text-faint; }
+.vidya-history-search-clear {
+  @apply absolute right-2 bg-transparent border-none text-text-faint cursor-pointer flex items-center p-0.5;
+}
+.vidya-history-search-clear:hover { color: var(--vidya-accent); }
+
+.vidya-history-list { @apply max-h-[260px] overflow-y-auto pr-0.5; }
+.vidya-history-list::-webkit-scrollbar { width: 4px; }
+.vidya-history-list::-webkit-scrollbar-thumb { background: var(--c-border-strong, #DAD6C7); border-radius: 4px; }
+.vidya-history-empty { @apply text-[0.72rem] text-text-faint py-2.5 px-0.5 leading-relaxed; }
+.vidya-qt-btn {
+  @apply block w-full mb-1 bg-surface border border-border text-text-muted py-2 px-2.5 rounded-token_sm text-[0.73rem] font-sans cursor-pointer text-left transition-all overflow-hidden text-ellipsis whitespace-nowrap;
+}
+.vidya-qt-btn:hover {
+  border-color: var(--vidya-accent);
+  @apply text-text bg-accent-soft;
+}
+
+/* Voice / key change */
+.vidya-voice-wrap { @apply px-[18px] pb-[18px]; }
+.vidya-voice-btn {
+  @apply w-full bg-surface border border-border text-text-muted p-2.5 rounded-[10px] font-sans text-[0.78rem] cursor-pointer transition-all;
+}
+.vidya-voice-btn:hover {
+  border-color: var(--vidya-accent);
+  @apply text-text;
+}
+
+/* ── Chat main ───────────────────────── */
+.vidya-chat-main { @apply flex-1 flex flex-col overflow-hidden bg-bg; }
+
+.vidya-chat-header {
+  @apply py-3.5 px-6 border-b border-border flex items-center gap-3 bg-bg;
+}
+.vidya-chat-header-name { @apply font-sans text-text text-base; }
+.vidya-status-dot { @apply text-[0.68rem] text-success flex items-center gap-1; }
+.vidya-status-dot::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--c-success, #3F7A5A);
+  border-radius: 50%;
+  display: inline-block;
+  animation: vidyaSp 2s infinite;
+}
+@keyframes vidyaSp { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.vidya-exam-ind { @apply ml-auto text-[0.68rem] font-bold py-1 px-2.5 rounded-token_pill; }
+
+/* Chatbox — centered Claude-style column */
+.vidya-chatbox {
+  @apply flex-1 overflow-y-auto pt-7 px-6 pb-3 flex flex-col gap-5;
+  scroll-behavior: smooth;
+}
+.vidya-chatbox::-webkit-scrollbar { width: 4px; }
+.vidya-chatbox::-webkit-scrollbar-thumb { background: var(--c-border-strong, #DAD6C7); border-radius: 3px; }
+
+.vidya-chatbox,
+.vidya-input-area {
+  @apply max-w-[760px] w-full mx-auto;
+}
+
+/* Welcome card */
+.vidya-welcome-card {
+  @apply !border !border-border rounded-token_lg py-5 px-[22px] !bg-surface;
+}
+.vidya-welcome-card h3 { @apply font-sans text-text text-[1.05rem] mb-1.5; }
+.vidya-welcome-card p { @apply text-[0.85rem] leading-relaxed text-text-muted; }
+.vidya-w-tags  { @apply flex gap-1.5 flex-wrap mt-2.5; }
+.vidya-w-tag   {
+  @apply py-1 px-2.5 rounded-token_pill text-[0.68rem] font-semibold bg-bg-tertiary border border-border text-text-muted;
+}
+
+/* Messages — Claude-style: assistant is plain text, user is a soft bubble */
+.vidya-msg {
+  @apply max-w-full text-[0.95rem] leading-[1.75] whitespace-pre-wrap text-text;
+  animation: vidyaSlideUp 0.25s ease-out;
+}
+@keyframes vidyaSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.vidya-msg.bot,
+.vidya-msg.greeting {
+  @apply self-start bg-transparent border-none py-0 px-0.5 max-w-[90%];
+}
+
+.vidya-msg.user {
+  @apply self-end max-w-[78%] py-3 px-[18px] rounded-[18px] rounded-br-[4px] !text-white font-medium;
+}
+
+/* Thinking indicator — mini breathing logo + shimmering text, Claude-style */
+.vidya-thinking-row {
+  @apply !flex !items-center gap-2.5 !py-0.5 !px-0.5;
+}
+.vidya-thinking-avatar-wrap {
+  @apply inline-flex items-center justify-center w-6 h-6 rounded-full shrink-0;
+  animation: vidyaBreathe 1.4s ease-in-out infinite;
+}
+.vidya-thinking-avatar {
+  @apply w-full h-full object-contain;
+  filter: drop-shadow(0 2px 6px rgba(var(--vidya-accent-rgb), 0.55));
+}
+.vidya-thinking-text {
+  font-size: 0.88rem;
+  font-weight: 500;
+  background: linear-gradient(
+    90deg,
+    var(--c-text-muted, #6B6759) 0%,
+    var(--vidya-accent) 45%,
+    var(--c-text-muted, #6B6759) 90%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  animation: vidyaShimmer 1.8s linear infinite;
+}
+@keyframes vidyaShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Input area — floating pill, Claude-style */
+.vidya-input-area { @apply pt-3.5 px-0 pb-[22px] bg-transparent border-t-0 flex gap-2.5 items-center; }
+.vidya-input {
+  @apply flex-1 bg-surface border-[1.5px] border-border text-text py-3.5 px-[18px] rounded-token_pill outline-none font-sans text-[0.92rem] transition-all shadow-token_sm;
+}
+.vidya-input:focus {
+  border-color: var(--vidya-accent);
+  box-shadow: 0 0 0 3px rgba(var(--vidya-accent-rgb), 0.12);
+}
+.vidya-input::placeholder { @apply text-text-faint; }
+.vidya-send-btn {
+  @apply border-none w-[46px] h-[46px] rounded-full cursor-pointer transition-all shrink-0 flex items-center justify-center shadow-token_sm hover:-translate-y-0.5 hover:brightness-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0;
+}
+
+/* ─── API Key Modal ───────────────────────────── */
+.vidya-key-overlay {
+  @apply fixed inset-0 z-[2000] flex items-center justify-center;
+  background: rgba(43, 41, 33, 0.45);
+  backdrop-filter: blur(6px);
+  animation: fadein 0.2s ease;
+}
+
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+.vidya-key-modal {
+  @apply bg-surface border border-border rounded-token_lg py-10 px-9 max-w-[440px] w-[90%] text-center shadow-token_lg;
+  animation: modal-pop 0.25s cubic-bezier(0.34,1.5,0.64,1);
+}
+
+@keyframes modal-pop {
+  from { transform: scale(0.88); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.vidya-key-icon { @apply text-4xl mb-3 text-accent; }
+
+.vidya-key-modal h2 { @apply font-sans text-xl font-bold text-text m-0 mb-2.5; }
+
+.vidya-key-modal p { @apply text-sm text-text-muted leading-relaxed m-0 mb-5; }
+
+.vidya-key-modal a { @apply text-accent-text underline; }
+
+.vidya-key-input {
+  @apply w-full py-3 px-4 rounded-token_sm border border-border bg-bg-secondary text-text text-sm font-mono outline-none box-border mb-3.5 transition-[border] duration-200;
+}
+
+.vidya-key-input:focus { @apply border-accent; }
+
+.vidya-key-btn {
+  @apply w-full py-3.5 border-none rounded-[10px] text-white text-[15px] font-bold cursor-pointer font-sans transition-all hover:opacity-90 hover:-translate-y-px;
+}
+
+.vidya-key-note {
+  @apply !text-xs !text-text-faint !mt-3 !mb-0;
+}
+
+/* ── Mobile hamburger toggle for the persona sidebar ── */
+.vidya-mobile-toggle {
+  @apply hidden fixed top-4 left-4 z-[220] w-[38px] h-[38px] items-center justify-center bg-surface border border-border rounded-token_sm text-text-muted cursor-pointer shadow-token_sm;
+}
+
+.vidya-sidebar-backdrop {
+  @apply fixed inset-0 z-[199];
+  background: rgba(20, 18, 12, 0.4);
+  animation: fadein 0.2s ease;
+}
+
+/* ── Fully adaptive layout — scales sidebar, type and spacing across the
+   whole viewport range instead of only snapping at one breakpoint ── */
+
+/* Large desktops / wide monitors */
+@media (min-width: 1440px) {
+  .vidya-sidebar { width: 320px; min-width: 320px; }
+  .vidya-chatbox, .vidya-input-area { max-width: 860px; }
+}
+
+/* Small laptops */
+@media (max-width: 1200px) {
+  .vidya-sidebar { width: 260px; min-width: 260px; }
+  .vidya-chatbox, .vidya-input-area { max-width: 680px; }
+}
+
+/* Tablets (portrait & landscape) */
+@media (max-width: 1024px) {
+  .vidya-sidebar { width: 240px; min-width: 240px; }
+  .vidya-sidebar-top { padding: 18px 14px 0; }
+  .vidya-history-wrap, .vidya-voice-wrap { padding-left: 14px; padding-right: 14px; }
+  .vidya-chatbox { padding: 22px 18px 12px; }
+}
+
+@media (max-width: 900px) {
+  .vidya-chatbox, .vidya-input-area { max-width: 100%; }
+}
+
+@media (max-width: 768px) {
+  .vidya-mobile-toggle { display: flex; }
+
+  .vidya-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    height: 100dvh;
+    width: min(300px, 86vw);
+    z-index: 210;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+  }
+  .vidya-sidebar.open {
+    transform: translateX(0);
+  }
+  .vidya-sidebar-top { padding-top: 64px; }
+
+  .vidya-chatbox, .vidya-input-area { padding-left: 12px; padding-right: 12px; }
+  .vidya-chat-header { padding-left: 56px; }
+  .vidya-history-list { max-height: 45vh; }
+}
+
+/* Small phones */
+@media (max-width: 600px) {
+  .vidya-chat-header { padding: 12px 14px 12px 56px; flex-wrap: wrap; row-gap: 6px; }
+  .vidya-chat-header-name { font-size: 0.92rem; }
+  .vidya-exam-ind { font-size: 0.6rem; padding: 3px 9px; }
+  .vidya-msg { font-size: 0.9rem; }
+  .vidya-input-area { padding: 10px 0 16px; gap: 8px; }
+  .vidya-input { padding: 12px 14px; font-size: 0.88rem; }
+  .vidya-send-btn { width: 42px; height: 42px; }
+}
+
+@media (max-width: 480px) {
+  .vidya-avatar-stage { height: 150px; }
+  .vidya-avatar-wrap, .vidya-avatar-logo-img { width: 72px; height: 72px; }
+  .vidya-key-modal { padding: 28px 22px; }
+  .vidya-msg.user { max-width: 88%; }
+  .vidya-exam-row { gap: 4px; }
+  .vidya-badge { font-size: 0.6rem; padding: 3px 8px; }
+  .vidya-history-search-input { font-size: 0.72rem; padding: 7px 26px; }
+}
+
+/* Very small / narrow phones */
+@media (max-width: 380px) {
+  .vidya-sidebar { width: 92vw; }
+  .vidya-chatbox { padding: 18px 10px 10px; }
+  .vidya-welcome-card { padding: 14px 16px; }
+  .vidya-welcome-card h3 { font-size: 0.95rem; }
+  .vidya-w-tag { font-size: 0.62rem; padding: 2px 8px; }
+  .vidya-input::placeholder { font-size: 0.8rem; }
+}
+
+/* Landscape phones — sidebar becomes a slim scrollable drawer, avatar shrinks
+   so the chat still has vertical room */
+@media (max-height: 480px) and (orientation: landscape) {
+  .vidya-avatar-stage { height: 110px; }
+  .vidya-avatar-wrap, .vidya-avatar-logo-img { width: 56px; height: 56px; }
+  .vidya-history-list { max-height: 25vh; }
+  .vidya-sidebar-top { padding-top: 54px; gap: 10px; }
+}

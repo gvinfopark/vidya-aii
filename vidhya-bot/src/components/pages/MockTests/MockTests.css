@@ -1,0 +1,127 @@
+/* Mock Test session/result screens — Tailwind @apply component classes,
+   mobile-first with responsive overrides matching the original breakpoints. */
+
+.mt-session { @apply flex flex-col min-h-screen bg-bg-secondary; }
+
+.mt-session-topbar {
+  @apply flex items-center justify-between py-3 px-4 sm:py-3.5 sm:px-7 bg-[color:var(--ink)] text-text-on-accent gap-2.5 sm:gap-4 sticky top-0 z-[100];
+}
+
+.mt-back-btn {
+  @apply py-2 px-4 rounded-lg border-[1.5px] border-white/20 bg-transparent text-white/75 text-[13px] font-semibold cursor-pointer font-sans transition-all whitespace-nowrap hover:bg-white/10 hover:text-text-on-accent;
+}
+
+.mt-session-info { @apply flex flex-col items-center gap-0.5 flex-1; }
+
+.mt-session-title { @apply text-xs sm:text-[15px] font-bold text-text-on-accent text-center; }
+
+.mt-timer { @apply text-lg sm:text-xl font-extrabold text-accent-text font-sans tracking-[2px]; }
+
+.mt-timer.urgent { @apply text-danger; animation: pulse 1s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.mt-submit-btn {
+  @apply py-2 px-4 sm:px-5 rounded-lg border-none text-text-on-accent text-[13px] font-bold cursor-pointer font-sans transition-all whitespace-nowrap hover:-translate-y-px;
+  background: var(--gold, #c9922a);
+}
+.mt-submit-btn:hover { background: var(--c-accent-hover); }
+
+.mt-progress-track { @apply h-1 bg-border; }
+.mt-progress-fill { @apply h-full bg-accent transition-[width] duration-300; }
+
+.mt-body {
+  @apply grid grid-cols-1 md:grid-cols-[1fr_220px] gap-4 sm:gap-5 p-4 sm:p-7 max-w-[1100px] mx-auto w-full;
+}
+
+.mt-q-panel { @apply bg-surface rounded-[18px] p-5 sm:p-8 shadow-token_md; }
+
+.mt-q-meta { @apply text-xs font-semibold text-text-faint mb-3.5 uppercase tracking-wide; }
+
+.mt-q-text { @apply text-base sm:text-lg font-bold text-text leading-relaxed mb-6; }
+
+.mt-options { @apply flex flex-col gap-3 mb-6; }
+
+.mt-option {
+  @apply flex items-center gap-3.5 py-3.5 px-4 sm:px-5 rounded-xl border-2 border-border bg-bg-secondary cursor-pointer text-sm font-medium text-text font-sans text-left transition-all hover:border-accent hover:bg-accent-soft;
+}
+
+.mt-option.selected { @apply !border-accent !bg-accent-soft-strong !text-accent-text font-bold; }
+
+.mt-opt-letter {
+  @apply w-7 h-7 rounded-full bg-border flex items-center justify-center font-extrabold text-xs shrink-0 text-text;
+}
+
+.mt-option.selected .mt-opt-letter { @apply !bg-accent !text-text-on-accent; }
+
+.mt-nav-btns { @apply flex gap-3 justify-end; }
+
+.mt-nav-btn {
+  @apply py-2.5 px-4 sm:px-6 rounded-[10px] text-sm font-bold cursor-pointer font-sans border-[1.5px] border-border bg-surface text-text transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:border-text;
+}
+
+.mt-nav-btn.primary { @apply !bg-[color:var(--ink)] !text-text-on-accent !border-[color:var(--ink)] hover:enabled:!bg-[color:var(--gold)] hover:enabled:!border-[color:var(--gold)]; }
+
+/* ── Palette ─────────────────────────────────── */
+.mt-palette-panel { @apply bg-surface rounded-[18px] p-5 shadow-token_md self-start sticky top-20 md:static; }
+
+.mt-palette-title { @apply text-[13px] font-bold text-text mb-3.5 uppercase tracking-wide; }
+
+.mt-palette-grid { @apply grid grid-cols-5 gap-1.5 mb-3.5; }
+
+.mt-palette-btn {
+  @apply w-8 h-8 rounded-md border-[1.5px] border-border bg-bg-tertiary text-[11px] font-bold cursor-pointer transition-all text-text hover:border-accent;
+}
+
+.mt-palette-btn.done { @apply !bg-accent-soft-strong !border-accent !text-accent-text; }
+.mt-palette-btn.active { @apply !text-text-on-accent; background: var(--gold, #c9922a); border-color: var(--gold, #c9922a); }
+
+.mt-palette-legend { @apply text-[11px] text-text-faint flex items-center gap-1.5 flex-wrap; }
+
+.mt-legend-dot { @apply inline-block w-2.5 h-2.5 rounded-[3px] bg-bg-tertiary border-[1.5px] border-border; }
+.mt-legend-dot.done { @apply !bg-accent-soft-strong !border-accent; }
+
+/* ── Result ──────────────────────────────────── */
+.mt-result { @apply min-h-screen flex items-start justify-center px-4 py-8 sm:px-6 sm:py-12 bg-bg-secondary; }
+
+.mt-result-card { @apply bg-surface rounded-3xl p-6 sm:p-11 max-w-[720px] w-full shadow-token_lg; }
+
+.mt-result-emoji { @apply text-5xl text-center mb-3; }
+
+.mt-result-title { @apply font-sans text-2xl font-extrabold text-center text-text mb-5; }
+
+.mt-result-score { @apply flex items-baseline justify-center gap-3.5 mb-7; }
+
+.mt-score-num { @apply font-sans text-5xl font-black; }
+
+.mt-score-pct { @apply text-xl text-text-faint font-bold; }
+
+.mt-result-breakdown { @apply flex flex-col gap-2 mb-7 max-h-[340px] overflow-y-auto; }
+
+.mt-rb-row { @apply flex items-start gap-2.5 py-2.5 px-3.5 rounded-[10px] text-[13px] bg-bg-secondary; }
+
+.mt-rb-row.correct { @apply !bg-accent-soft; }
+.mt-rb-row.wrong   { @apply !bg-danger-soft; }
+
+.mt-rb-icon { @apply text-sm shrink-0 mt-px; }
+
+.mt-rb-q { @apply flex-1 text-text font-medium leading-snug; }
+
+.mt-rb-ans {
+  @apply text-[11px] text-success font-bold whitespace-nowrap bg-accent-soft-strong py-0.5 px-2 rounded-[10px] shrink-0;
+}
+
+.mt-result-btns { @apply flex gap-3 justify-center flex-wrap; }
+
+.mt-btn-primary {
+  @apply py-3 px-6 rounded-[10px] text-text-on-accent border-none text-sm font-bold cursor-pointer font-sans transition-colors;
+  background: var(--ink, #0d1b2a);
+}
+.mt-btn-primary:hover { background: var(--gold, #c9922a); }
+
+.mt-btn-outline {
+  @apply py-3 px-6 rounded-[10px] bg-transparent text-text border-[1.5px] border-border text-sm font-bold cursor-pointer font-sans transition-all hover:border-accent hover:text-accent;
+}

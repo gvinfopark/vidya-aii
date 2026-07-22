@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Vidhya — ChatGPT-inspired design tokens
+   Neutral canvas, monochrome UI chrome, single accent used sparingly.
+   Supports light (default) and dark themes via [data-theme="dark"] on <html>.
+   Import this once (in index.js) and every component can reference these
+   CSS variables — most already do, so switching themes re-skins the app.
+   ========================================================================== */
+
+:root {
+  /* Backgrounds */
+  --c-bg:            #FFFFFF;   /* main canvas */
+  --c-bg-secondary:  #F9F9F9;   /* sidebar / panel background */
+  --c-bg-tertiary:   #ECECEC;   /* hover / subtle fills */
+  --c-surface:       #FFFFFF;   /* cards, inputs, popovers */
+  --c-surface-raised:#FFFFFF;
+
+  /* Text */
+  --c-text:          #0D0D0D;   /* primary ink */
+  --c-text-muted:    #6E6E80;   /* secondary text */
+  --c-text-faint:    #8E8EA0;   /* placeholders, timestamps */
+  --c-text-on-accent:#FFFFFF;
+
+  /* Borders */
+  --c-border:        #E5E5E5;
+  --c-border-strong: #D4D4D8;
+
+  /* Accent — used sparingly, like ChatGPT's understated highlight color */
+  --c-accent:        #10A37F;
+  --c-accent-hover:  #0E8F6F;
+  --c-accent-active: #0C7C61;
+  --c-accent-soft:   rgba(16, 163, 127, 0.10);
+  --c-accent-soft-strong: rgba(16, 163, 127, 0.18);
+  --c-accent-text:   #0E8F6F;
+
+  /* Primary action (black in light mode, white in dark — ChatGPT's send/submit buttons) */
+  --c-primary:        #0D0D0D;
+  --c-primary-hover:  #262626;
+  --c-primary-text:   #FFFFFF;
+
+  /* Status */
+  --c-success:       #15803D;
+  --c-danger:        #D92D20;
+  --c-danger-soft:   rgba(217, 45, 32, 0.10);
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.14);
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-pill: 999px;
+
+  /* Type — ChatGPT uses a plain, neutral grotesk with no serif anywhere */
+  --font-serif: var(--font-sans);
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  /* Legacy aliases still referenced by some page components */
+  --ink: var(--c-text);
+  --paper: var(--c-bg);
+  --cream: var(--c-bg-tertiary);
+  --gold: var(--c-accent);
+  --gold-light: var(--c-accent-hover);
+  --teal: var(--c-accent);
+  --teal-light: var(--c-accent-hover);
+  --rust: var(--c-danger);
+  --slate: var(--c-text-muted);
+  --muted: var(--c-text-faint);
+  --border: var(--c-border);
+}
+
+/* ── Dark theme — ChatGPT dark mode ─────────────────────────────────── */
+[data-theme="dark"] {
+  --c-bg:            #212121;
+  --c-bg-secondary:  #171717;
+  --c-bg-tertiary:   #2F2F2F;
+  --c-surface:       #2A2A2A;
+  --c-surface-raised:#333333;
+
+  --c-text:          #ECECEC;
+  --c-text-muted:    #B4B4B4;
+  --c-text-faint:    #8E8EA0;
+  --c-text-on-accent:#FFFFFF;
+
+  --c-border:        #3F3F3F;
+  --c-border-strong: #4D4D4D;
+
+  --c-accent:        #10A37F;
+  --c-accent-hover:  #1AB98E;
+  --c-accent-active: #0E8F6F;
+  --c-accent-soft:   rgba(16, 163, 127, 0.16);
+  --c-accent-soft-strong: rgba(16, 163, 127, 0.26);
+  --c-accent-text:   #3FCBA5;
+
+  --c-primary:        #FFFFFF;
+  --c-primary-hover:  #E5E5E5;
+  --c-primary-text:   #0D0D0D;
+
+  --c-success:       #4ADE80;
+  --c-danger:        #F87171;
+  --c-danger-soft:   rgba(248, 113, 113, 0.15);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+html { background: var(--c-bg); color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
